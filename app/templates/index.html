@@ -39,6 +39,24 @@
             </form>
         </div>
 
+        <!-- Recommendations Section -->
+        {% if recommendations %}
+        <div class="mb-8 bg-[#2c1810]/5 p-6 rounded-lg border-l-4 border-[#8b4513]">
+            <h2 class="text-xl font-library font-bold mb-4 text-[#2c1810]">📚 Recommended Books</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {% for book in recommendations %}
+                <div class="bg-white/90 p-4 rounded-lg shadow-sm border border-[#8b4513]/20 hover:shadow-md transition-shadow">
+                    <h3 class="font-library font-bold text-[#2c1810]">{{ book.title }}</h3>
+                    <p class="text-[#2c1810]/80 text-sm italic">By {{ book.author }}</p>
+                    {% if book.genre %}
+                    <p class="text-[#2c1810]/60 text-sm mt-1">Genre: {{ book.genre }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Add Book Form -->
         <div class="mb-8 bg-white/90 p-6 rounded-lg shadow-md border-t-4 border-[#8b4513]">
             <h2 class="text-xl font-library font-bold mb-4 text-[#2c1810]">Add New Book</h2>
