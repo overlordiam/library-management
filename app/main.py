@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Depends, Form, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -49,7 +50,7 @@ async def add_book(
     )
     db.add(book)
     await db.commit()
-    return {"success": True}
+    return RedirectResponse(url="/", status_code=303)
 
 @app.post("/books/{book_id}/delete")
 async def delete_book(book_id: int, db: AsyncSession = Depends(get_db)):
@@ -59,7 +60,7 @@ async def delete_book(book_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Book not found")
     await db.delete(book)
     await db.commit()
-    return {"success": True}
+    return RedirectResponse(url="/", status_code=303)
 
 @app.post("/books/{book_id}/update")
 async def update_book(
@@ -83,7 +84,7 @@ async def update_book(
     book.genre = genre
     
     await db.commit()
-    return {"success": True}
+    return RedirectResponse(url="/", status_code=303)
 
 @app.post("/books/{book_id}/checkout")
 async def checkout_book(
@@ -104,7 +105,7 @@ async def checkout_book(
     book.checkout_date = datetime.now()
     
     await db.commit()
-    return {"success": True}
+    return RedirectResponse(url="/", status_code=303)
 
 @app.post("/books/{book_id}/checkin")
 async def checkin_book(book_id: int, db: AsyncSession = Depends(get_db)):
@@ -119,7 +120,7 @@ async def checkin_book(book_id: int, db: AsyncSession = Depends(get_db)):
     book.return_date = datetime.now()
     
     await db.commit()
-    return {"success": True}
+    return RedirectResponse(url="/", status_code=303)
 
 @app.get("/books/search")
 async def search_books(

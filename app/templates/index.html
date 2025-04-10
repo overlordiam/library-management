@@ -6,37 +6,54 @@
     <title>Library Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        .font-library { font-family: 'Libre Baskerville', serif; }
+        .book-card {
+            background: linear-gradient(to right bottom, #fff, #f8f4e9);
+            border-left: 5px solid #8b4513;
+        }
+        .book-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(139, 69, 19, 0.1), 0 2px 4px -1px rgba(139, 69, 19, 0.06);
+            transition: all 0.2s ease;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-8 text-center">Library Management System</h1>
-        
+<body class="bg-[#f8f4e9] min-h-screen">
+    <nav class="bg-[#2c1810] text-white py-4 shadow-lg mb-8">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-library font-bold text-center">📚 Library Management System</h1>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-4">
         <!-- Search Bar -->
         <div class="mb-8">
-            <form action="/books/search" method="GET" class="flex gap-2">
+            <form action="/books/search" method="GET" class="flex gap-2" id="searchForm">
                 <input type="text" name="query" placeholder="Search by title, author, or ISBN" 
-                       class="flex-1 p-2 border rounded-lg" value="{{ search_query or '' }}">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                       class="flex-1 p-3 border-2 border-[#8b4513] rounded-lg bg-white/90 placeholder-[#8b4513]/60 focus:outline-none focus:ring-2 focus:ring-[#8b4513]/50">
+                <button type="submit" class="bg-[#8b4513] text-white px-6 py-2 rounded-lg hover:bg-[#723a0f] transition-colors font-semibold">
                     Search
                 </button>
             </form>
         </div>
 
         <!-- Add Book Form -->
-        <div class="mb-8 bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-4">Add New Book</h2>
+        <div class="mb-8 bg-white/90 p-6 rounded-lg shadow-md border-t-4 border-[#8b4513]">
+            <h2 class="text-xl font-library font-bold mb-4 text-[#2c1810]">Add New Book</h2>
             <form action="/books/add" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="text" name="title" placeholder="Title" required
-                       class="p-2 border rounded-lg">
+                       class="p-2 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
                 <input type="text" name="author" placeholder="Author" required
-                       class="p-2 border rounded-lg">
+                       class="p-2 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
                 <input type="text" name="isbn" placeholder="ISBN (optional)"
-                       class="p-2 border rounded-lg">
+                       class="p-2 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
                 <input type="number" name="publication_year" placeholder="Publication Year (optional)"
-                       class="p-2 border rounded-lg">
+                       class="p-2 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
                 <input type="text" name="genre" placeholder="Genre (optional)"
-                       class="p-2 border rounded-lg">
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                       class="p-2 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
+                <button type="submit" class="bg-[#2c1810] text-white px-4 py-2 rounded-lg hover:bg-[#1a0f0a] transition-colors font-semibold">
                     Add Book
                 </button>
             </form>
@@ -44,52 +61,67 @@
 
         <!-- Books List -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% if not books %}
+            <div class="col-span-full text-center py-8">
+                {% if search_query %}
+                <div class="bg-[#2c1810]/5 border border-[#2c1810]/20 rounded-lg p-6">
+                    <p class="text-lg text-[#2c1810] mb-2 font-library">No books found matching "{{ search_query }}"</p>
+                    <a href="/" class="text-[#8b4513] hover:text-[#2c1810] underline font-semibold">View all books</a>
+                </div>
+                {% else %}
+                <div class="bg-[#2c1810]/5 border border-[#2c1810]/20 rounded-lg p-6">
+                    <p class="text-lg text-[#2c1810] font-library">No books in the library yet</p>
+                    <p class="text-[#2c1810]/70">Add your first book using the form above</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
             {% for book in books %}
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-semibold mb-2">{{ book.title }}</h3>
-                <p class="text-gray-600 mb-2">By {{ book.author }}</p>
+            <div class="book-card p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-library font-bold mb-2 text-[#2c1810]">{{ book.title }}</h3>
+                <p class="text-[#2c1810]/80 mb-2 italic">By {{ book.author }}</p>
                 {% if book.isbn %}
-                <p class="text-sm text-gray-500 mb-1">ISBN: {{ book.isbn }}</p>
+                <p class="text-sm text-[#2c1810]/60 mb-1">ISBN: {{ book.isbn }}</p>
                 {% endif %}
                 {% if book.publication_year %}
-                <p class="text-sm text-gray-500 mb-1">Year: {{ book.publication_year }}</p>
+                <p class="text-sm text-[#2c1810]/60 mb-1">Year: {{ book.publication_year }}</p>
                 {% endif %}
                 {% if book.genre %}
-                <p class="text-sm text-gray-500 mb-3">Genre: {{ book.genre }}</p>
+                <p class="text-sm text-[#2c1810]/60 mb-3">Genre: {{ book.genre }}</p>
                 {% endif %}
                 
                 <div class="flex items-center mb-4">
-                    <span class="mr-2">Status:</span>
+                    <span class="mr-2 text-[#2c1810]/80">Status:</span>
                     {% if book.is_available %}
-                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">Available</span>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-semibold">Available</span>
                     {% else %}
-                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm">Checked Out</span>
+                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm font-semibold">Checked Out</span>
                     {% endif %}
                 </div>
 
                 {% if not book.is_available %}
-                <p class="text-sm text-gray-600 mb-2">Borrowed by: {{ book.borrower_name }}</p>
+                <p class="text-sm text-[#2c1810]/70 mb-2">Borrowed by: {{ book.borrower_name }}</p>
                 {% endif %}
 
                 <div class="flex gap-2 mt-4">
                     {% if book.is_available %}
                     <button onclick="checkoutBook('{{ book.id }}')" 
-                            class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                            class="bg-[#8b4513] text-white px-3 py-1 rounded hover:bg-[#723a0f] transition-colors">
                         Check Out
                     </button>
                     {% else %}
                     <form action="/books/{{ book.id }}/checkin" method="POST">
-                        <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                        <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-colors">
                             Check In
                         </button>
                     </form>
                     {% endif %}
                     <button onclick="editBook('{{ book.id }}')"
-                            class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                            class="bg-[#2c1810] text-white px-3 py-1 rounded hover:bg-[#1a0f0a] transition-colors">
                         Edit
                     </button>
                     <form action="/books/{{ book.id }}/delete" method="POST" class="inline">
-                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                        <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-colors">
                             Delete
                         </button>
                     </form>
@@ -101,17 +133,17 @@
 
     <!-- Modal for checkout -->
     <div id="checkoutModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-lg w-96">
-            <h2 class="text-xl font-semibold mb-4">Check Out Book</h2>
+        <div class="bg-white p-6 rounded-lg w-96 border-t-4 border-[#8b4513]">
+            <h2 class="text-xl font-library font-bold mb-4 text-[#2c1810]">Check Out Book</h2>
             <form id="checkoutForm" method="POST" class="space-y-4">
                 <input type="text" name="borrower_name" placeholder="Borrower's Name" required
-                       class="w-full p-2 border rounded-lg">
+                       class="w-full p-3 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeCheckoutModal()"
-                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors">
                         Cancel
                     </button>
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    <button type="submit" class="bg-[#8b4513] text-white px-4 py-2 rounded hover:bg-[#723a0f] transition-colors">
                         Confirm
                     </button>
                 </div>
@@ -120,6 +152,17 @@
     </div>
 
     <script>
+        // Clean up URL on page load if it's a search result
+        if (window.location.search.includes('query=')) {
+            window.history.replaceState({}, '', '/');
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            setTimeout(() => {
+                this.reset();
+            }, 100);
+        });
+
         function checkoutBook(bookId) {
             const modal = document.getElementById('checkoutModal');
             const form = document.getElementById('checkoutForm');
