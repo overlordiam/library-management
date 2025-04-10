@@ -134,7 +134,7 @@
                         </button>
                     </form>
                     {% endif %}
-                    <button onclick="editBook('{{ book.id }}')"
+                    <button onclick='editBook("{{ book.id }}", "{{ book.title|replace('"', '\\"') }}", "{{ book.author|replace('"', '\\"') }}", "{{ book.isbn|replace('"', '\\"') }}", "{{ book.publication_year }}", "{{ book.genre|replace('"', '\\"') }}")'
                             class="bg-[#2c1810] text-white px-3 py-1 rounded hover:bg-[#1a0f0a] transition-colors">
                         Edit
                     </button>
@@ -169,6 +169,34 @@
         </div>
     </div>
 
+    <!-- Modal for edit -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-96 border-t-4 border-[#8b4513]">
+            <h2 class="text-xl font-library font-bold mb-4 text-[#2c1810]">Edit Book</h2>
+            <form id="editForm" method="POST" class="space-y-4">
+                <input type="text" name="title" placeholder="Title" required
+                       class="w-full p-3 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
+                <input type="text" name="author" placeholder="Author" required
+                       class="w-full p-3 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
+                <input type="text" name="isbn" placeholder="ISBN (optional)"
+                       class="w-full p-3 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
+                <input type="number" name="publication_year" placeholder="Publication Year (optional)"
+                       class="w-full p-3 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
+                <input type="text" name="genre" placeholder="Genre (optional)"
+                       class="w-full p-3 border-2 border-[#8b4513]/20 rounded-lg focus:border-[#8b4513] focus:outline-none">
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeEditModal()"
+                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-[#8b4513] text-white px-4 py-2 rounded hover:bg-[#723a0f] transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Clean up URL on page load if it's a search result
         if (window.location.search.includes('query=')) {
@@ -193,10 +221,39 @@
             modal.classList.add('hidden');
         }
 
-        // Close modal when clicking outside
+        function editBook(bookId, title, author, isbn, publicationYear, genre) {
+            const modal = document.getElementById('editModal');
+            const form = document.getElementById('editForm');
+            
+            // Set form values
+            form.querySelector('[name="title"]').value = title;
+            form.querySelector('[name="author"]').value = author;
+            form.querySelector('[name="isbn"]').value = isbn || '';
+            form.querySelector('[name="publication_year"]').value = publicationYear || '';
+            form.querySelector('[name="genre"]').value = genre || '';
+            
+            // Set form action
+            form.action = `/books/${bookId}/update`;
+            
+            // Show modal
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editModal');
+            modal.classList.add('hidden');
+        }
+
+        // Close modals when clicking outside
         document.getElementById('checkoutModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeCheckoutModal();
+            }
+        });
+
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
             }
         });
     </script>
