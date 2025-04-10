@@ -137,19 +137,34 @@ A modern, user-friendly library management system built with FastAPI and SQLite.
 4. Use these settings:
    - Environment: `Python`
    - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4`
+   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}`
    - Environment Variables:
      - `PYTHON_VERSION`: `3.11.0`
-     - `PORT`: `10000` (Render's default port)
-
-> **Note**: The application must bind to `0.0.0.0` and use the `PORT` environment variable on Render. This is handled automatically by the configuration above.
 
 ### Port Configuration
 
 - The application binds to `0.0.0.0` to serve HTTP requests
-- Uses the `PORT` environment variable (default: 10000)
-- Multiple workers (4) for better performance
-- Automatic port detection by Render
+- Uses Render's `PORT` environment variable (defaults to 10000 if not set)
+- Production-ready configuration without development flags
+- Automatic HTTPS handling by Render's load balancer
+
+### Important Notes
+
+1. **Development vs Production**
+
+   - Local development uses: `uvicorn app.main:app --reload`
+   - Production (Render) uses: `uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}`
+
+2. **SSL/HTTPS**
+
+   - Render handles SSL termination automatically
+   - Your app will be available via HTTPS
+   - HTTP requests are automatically redirected to HTTPS
+
+3. **Troubleshooting**
+   - If deployment fails, check the logs for port binding issues
+   - Ensure the app is not binding to `127.0.0.1` in production
+   - Avoid using Render's reserved ports (18012, 18013, 19099)
 
 ## 🔧 Technical Details
 
