@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, Depends, Form, HTTPException
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, PlainTextResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
@@ -16,6 +16,11 @@ app = FastAPI()
 # Templates
 templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 templates = Jinja2Templates(directory=templates_dir)
+
+# Add HEAD request handler for health checks
+@app.head("/")
+async def head():
+    return PlainTextResponse("")
 
 async def get_book_recommendations(db: AsyncSession, user_book: Book) -> list[Book]:
     # Create a search pattern based on the book's genre and title keywords
